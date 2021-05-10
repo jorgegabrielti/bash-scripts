@@ -42,7 +42,6 @@ sshpass_config ()
       export SSHPASS=$(gpg -d -q .sshpasswd.gpg)
       rm -f .sshpasswd
     fi 
-
   fi 
 
 }

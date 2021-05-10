@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Requirements
+# - openfortivpn
 # - sshpass
 # - gpg
 

@@ -1,8 +1,7 @@
 #!/bin/bash
 
-
-# Bastion Host Conpany
-BASTION_HOST="192.168.35.50"
+# Bastion host company
+BASTION_HOST="<HOST BASTION>"
 
 # Open connection vpn fortclient
 echo "Openfortivpn starting ..."
@@ -50,7 +49,7 @@ case $1 in
      sshpass -e ssh ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
      ;;
      *)
-     .
+     exit 0
      ;;
 esac
 

@@ -14,7 +14,7 @@ else
 fi
 
 
-_sshpass_config ()
+sshpass_config ()
 {
   if [ ! -e .sshpasswd.gpg ]; then
     read -p "Type your password: " PASSWORD
@@ -45,7 +45,7 @@ _sshpass_config ()
 ### sshpass with gpg
 case $1 in 
     "--sshpass-config")
-     _sshpass_config
+     sshpass_config
      sshpass -e ssh ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
      ;;
      *)

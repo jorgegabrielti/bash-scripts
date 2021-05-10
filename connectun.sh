@@ -6,18 +6,34 @@
 # - gpg
 
 
+### Default variables
+
 # Bastion host company
 BASTION_HOST="<HOST BASTION>"
 
-# Open connection vpn fortclient
-echo "Openfortivpn starting ..."
-nohup openfortivpn > /dev/null 2>&1 &
+# ------------------------------------------------------
 
-if [ "$?" == "0" ]; then
-  echo -e "Openfortivpn connected: [OK]\n"
-else 
-  echo -e "Openfortivpn connected: [FAIL]\n"
-fi
+help () 
+{
+  echo "Usage: ./connectun.sh [OPTION]"
+  echo "  --openfortivpn      connect a connect a fortigate-based vpn"
+  echo "  --sshpass-config    config sshpass to access without password"
+  
+}
+
+
+openfortivpn_connect ()
+{
+  # Open connection vpn fortclient
+  echo "Openfortivpn starting ..."
+  nohup openfortivpn > /dev/null 2>&1 &
+
+  if [ "$?" == "0" ]; then
+    echo -e "Openfortivpn connected: [OK]\n"
+  else 
+    echo -e "Openfortivpn connected: [FAIL]\n"
+  fi
+}
 
 
 sshpass_config ()
@@ -54,8 +70,11 @@ case $1 in
    sshpass_config
    sshpass -e ssh ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
    ;;
+   "--openfortivpn")
+   openfortivpn_connect
+   ;;
   *)
-   exit 0
+   help
   ;;
 
 esac

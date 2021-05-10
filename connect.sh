@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Requirements
+# - sshpass
+# - gpg
+
+
 # Bastion host company
 BASTION_HOST="<HOST BASTION>"
 
@@ -44,12 +49,14 @@ sshpass_config ()
 
 ### sshpass with gpg
 case $1 in 
-    "--sshpass-config")
-     sshpass_config
-     sshpass -e ssh ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
-     ;;
-     *)
-     exit 0
-     ;;
+
+  "--sshpass-config")
+   sshpass_config
+   sshpass -e ssh ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
+   ;;
+  *)
+   exit 0
+  ;;
+
 esac
 

@@ -1,6 +1,8 @@
 #!/bin/bash
 
-grep -vi 'duration' report.csv \
+FILE=$1
+
+grep -vi 'duration' ${FILE} \
 | while read LINE; do
 
     DURATION="$(echo $LINE | cut -d',' -f7 | tr -d '"')"
@@ -44,9 +46,7 @@ grep -vi 'duration' report.csv \
     DURATION_CONVERT=$(echo ${DURATION_CONVERT} | bc)
     echo ${LINE} | sed "s/$DURATION/${DURATION_CONVERT}/g"
     unset DURATION_CONVERT
-  done | tee -a new.csv
+  done | tee -a ${FILE%%.csv}${FILE%%.csv}-convert.csv
 
 
-#echo ${LINE} | sed "s/$DURATION/${DURATION_CONVERT}/g"
-#grep -vi 'duration' report.csv | while read LINE; do      DURATION=$(echo $LINE | cut -d',' -f7);      DURATION_CONVERTED=$(echo $LINE | cut -d',' -f7 | tr -s '[=h=]|[=m=][:blank:]' ':' | tr -d 's|"|\'\' | cut -d':' -f -3);      echo ${LINE} | sed "s/$DURATION/${DURATION_CONVERTED}/g";  done | tee -a new.csv
 

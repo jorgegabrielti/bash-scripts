@@ -6,14 +6,14 @@ grep -vi 'duration' report.csv \
     DURATION="$(echo $LINE | cut -d',' -f7 | tr -d '"')"
 
     # Time obtained
-    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]d') ]; then
-      DAY=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]d' | tr -d '[:alpha:]')
+    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}d') ]; then
+      DAY=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}d' | tr -d '[:alpha:]')
       D=$(echo "${DAY}*86400" | bc)
       DURATION_CONVERT="${D}"
     fi 
 
-    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]h') ]; then
-      HOU=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]h' | tr -d '[:alpha:]')
+    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}h') ]; then
+      HOU=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}h' | tr -d '[:alpha:]')
       H=$(echo "${HOU}*3600" | bc)
       if [ ! -z ${DURATION_CONVERT} ]; then
         DURATION_CONVERT="${DURATION_CONVERT}+${H}"
@@ -22,8 +22,8 @@ grep -vi 'duration' report.csv \
       fi 
     fi
     
-    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]m') ]; then
-      MIN=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]m' | tr -d '[:alpha:]')
+    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}m') ]; then
+      MIN=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}m' | tr -d '[:alpha:]')
       M=$(echo "${MIN}*60" | bc)
       if [ ! -z ${DURATION_CONVERT} ]; then
         DURATION_CONVERT="${DURATION_CONVERT}+${M}"
@@ -32,8 +32,8 @@ grep -vi 'duration' report.csv \
       fi
     fi 
 
-    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]s') ]; then
-      SEC=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '[[:digit:]]s' | tr -d '[:alpha:]')
+    if [ $(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}s') ]; then
+      SEC=$(echo $LINE | cut -d',' -f7 | tr -d '"' | grep -Eo '.[[:digit:]]{0,9}s' | tr -d '[:alpha:]')
       S=${SEC} 
       if [ ! -z ${DURATION_CONVERT} ]; then
         DURATION_CONVERT="${DURATION_CONVERT}+${S}"
@@ -41,11 +41,10 @@ grep -vi 'duration' report.csv \
         DURATION_CONVERT="${S}"
       fi
     fi
-    echo ${DURATION_CONVERT} | bc
+    DURATION_CONVERT=$(echo ${DURATION_CONVERT} | bc)
+    echo ${LINE} | sed "s/$DURATION/${DURATION_CONVERT}/g"
     unset DURATION_CONVERT
-  done 
-  
-#| tee -a new.csv
+  done | tee -a new.csv
 
 
 #echo ${LINE} | sed "s/$DURATION/${DURATION_CONVERT}/g"

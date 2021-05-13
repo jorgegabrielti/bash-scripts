@@ -18,7 +18,6 @@ help ()
   echo "Usage: ./connectun.sh [OPTION]"
   echo "  --openfortivpn      connect a connect a fortigate-based vpn"
   echo "  --sshpass-config    config sshpass to access without password"
-  
 }
 
 
@@ -60,7 +59,6 @@ sshpass_config ()
       rm -f .sshpasswd
     fi 
   fi 
-
 }
 
 ### sshpass with gpg

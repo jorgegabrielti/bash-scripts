@@ -1,3 +1,4 @@
 .log
 .sshpasswd.gpg
 nohup.out
+utils/*

@@ -9,8 +9,10 @@
 ### Default variables
 
 # Bastion host company
-BASTION_HOST="<HOST BASTION>"
+BASTION_HOST="<BASTION HOST>"
 
+# Openfortivpn configs
+OPENFORTIVPN_RECONNECT_TIME_LOOP="120"
 # ------------------------------------------------------
 
 help () 
@@ -25,7 +27,7 @@ openfortivpn_connect ()
 {
   # Open connection vpn fortclient
   echo "Openfortivpn starting ..."
-  nohup openfortivpn > /dev/null 2>&1 &
+  nohup openfortivpn --persistent=${OPENFORTIVPN_RECONNECT_TIME_LOOP} > /dev/null 2>&1 &
 
   if [ "$?" == "0" ]; then
     echo -e "Openfortivpn connected: [OK]\n"
@@ -61,15 +63,33 @@ sshpass_config ()
   fi 
 }
 
+#gitlab_server_tun () 
+#{
+
+#}
+
+# Bastion host validation
+[ $(echo ${BASTION_HOST} | grep -Eo '[0-9]{0,3}\.[0-9]{0,3}\.[0-9]{0,3}\.[0-9]{0,3}') ] \
+&& echo "[OK]  :" \
+|| echo "[FAIL]: Bastion host not defined!" && exit 0
+
 ### sshpass with gpg
 case $1 in 
 
-  "--sshpass-config")
-   sshpass_config
-   sshpass -e ssh ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
+   "--sshpass-config")
+     sshpass_config
+     sshpass -e ssh ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
    ;;
    "--openfortivpn")
-   openfortivpn_connect
+     openfortivpn_connect
+   ;;
+   "-t|--tunnel")
+   shift
+    case "$1" in
+	    "--gitlab-server")
+        gitlab_server_tun
+		  ;;
+    esac  
    ;;
   *)
    help

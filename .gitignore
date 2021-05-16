@@ -3,3 +3,4 @@
 .sshpasswd.gpg
 nohup.out
 */*.csv
+conf/tunnel.conf

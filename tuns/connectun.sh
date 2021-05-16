@@ -13,6 +13,8 @@ help ()
   echo "Usage: ./connectun.sh [OPTION]"
   echo "  --openfortivpn      connect a fortigate-based vpn"
   echo "  --sshpass-config    config sshpass to access without password"
+  echo "  --tunnel            ssh tunnels defined in the file conf/tuns.db"
+  
 }
 
 openfortivpn_connect ()
@@ -95,49 +97,42 @@ valid_ip ()
 # Tunnel create
 host_connect ()
 {
+  # Source config file
   source conf/connectun.conf
   source conf/tuns.db
 
   # Connect to vpn
   openfortivpn_connect
 
-  # Source config file
-  source conf/connectun.conf
-
   # Validation regex ip
   valid_ip ${PROXY} ${HOST}
 
   # Connect in proxy to tunnel
   sed -i 's/\r$//' conf/tuns.conf
-  TUN_COUNT=$(grep -cv 'localport' conf/tuns.conf)
+  TUN_COUNT=$(grep -cv 'localport' conf/tuns.db)
   for ((i=0; i<${TUN_COUNT}; i++)); do 
-    STRING_TUNS["$i"]="$(echo $(grep -v 'localport' conf/tuns.conf | head -n$((${i} + 1)) | tail -n1))"
+    STRING_TUNS["$i"]="$(echo -L:$(grep -v 'localport' conf/tuns.db | head -n$((${i} + 1)) | tail -n1))"
   done
-  sshpass -e ssh ${STRING_TUNS[*]} ${USER}@${BASTION_HOST} -o StrictHostKeyChecking=no
+  sshpass -p $(gpg -d -q .sshpasswd.gpg) ssh ${STRING_TUNS[*]} ${USER_TUN}@${BASTION_HOST} -o StrictHostKeyChecking=no -fgnNT 
+
 }
 
 ### sshpass with gpg
 case $1 in 
 
-   "--sshpass-config")
-     sshpass_config
-     openfortivpn_connect
-     echo -e "\nTry: 'sshpass -p \$(gpg -d -q .sshpasswd.gpg) ssh ${USER_TUN}@${BASTION_HOST} -o StrictHostKeyChecking=no'"
-
-   ;;
-   "--openfortivpn")
-     openfortivpn_connect
-   ;;
-   "-t|--tunnel")
-   shift
-    case "$1" in
-	    "--host-connect")
-      host_connect ${PROXY} ${HOST[*]}
-		  ;;
-    esac  
-   ;;
+  "--sshpass-config")
+    sshpass_config
+    openfortivpn_connect
+    echo -e "\nTry: 'sshpass -p \$(gpg -d -q .sshpasswd.gpg) ssh ${USER_TUN}@${BASTION_HOST} -o StrictHostKeyChecking=no'"
+  ;;
+  "--openfortivpn")
+    openfortivpn_connect
+  ;;
+  "--tunnel")
+    host_connect ${PROXY} ${HOST[*]}
+	;;
   *)
-   help
+    help
   ;;
 
 esac

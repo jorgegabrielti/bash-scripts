@@ -34,7 +34,7 @@ openfortivpn_connect ()
   else
     # Open connection vpn fortclient
     echo -e "\nOpenfortivpn starting ...\n"
-    nohup openfortivpn --persistent=${OPENFORTIVPN_RECONNECT_TIME_LOOP} > /dev/null 2>&1 &
+    nohup openfortivpn --persistent=${OPENFORTIVPN_RECONNECT_TIME_LOOP} & > /dev/null 2>&1 
 
     if [ "$?" == "0" ]; then
       echo -e "Openfortivpn connected: [OK]\n"
@@ -122,7 +122,8 @@ case $1 in
    "--sshpass-config")
      sshpass_config
      openfortivpn_connect
-     sshpass -f .sshpasswd ssh ${USER_TUN}@${BASTION_HOST} -o StrictHostKeyChecking=no
+     echo -e "\nTry: 'sshpass -p \$(gpg -d -q .sshpasswd.gpg) ssh ${USER_TUN}@${BASTION_HOST} -o StrictHostKeyChecking=no'"
+
    ;;
    "--openfortivpn")
      openfortivpn_connect

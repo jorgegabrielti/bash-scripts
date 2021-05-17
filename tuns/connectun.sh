@@ -36,7 +36,8 @@ openfortivpn_connect ()
   else
     # Open connection vpn fortclient
     echo -e "\nOpenfortivpn starting ...\n"
-    nohup openfortivpn --persistent=${OPENFORTIVPN_RECONNECT_TIME_LOOP} & > /dev/null 2>&1 
+    nohup openfortivpn --persistent=${OPENFORTIVPN_RECONNECT_TIME_LOOP} & > /dev/null 2>&1
+    ping -c 4 -q ${BASTION_HOST}
 
     if [ "$?" == "0" ]; then
       echo -e "Openfortivpn connected: [OK]\n"
@@ -99,7 +100,6 @@ host_connect ()
 {
   # Source config file
   source conf/connectun.conf
-  source conf/tuns.db
 
   # Connect to vpn
   openfortivpn_connect
@@ -108,13 +108,12 @@ host_connect ()
   valid_ip ${PROXY} ${HOST}
 
   # Connect in proxy to tunnel
-  sed -i 's/\r$//' conf/tuns.conf
+  sed -i 's/\r$//' conf/tuns.db
   TUN_COUNT=$(grep -cv 'localport' conf/tuns.db)
   for ((i=0; i<${TUN_COUNT}; i++)); do 
     STRING_TUNS["$i"]="$(echo -L:$(grep -v 'localport' conf/tuns.db | head -n$((${i} + 1)) | tail -n1))"
   done
   sshpass -p $(gpg -d -q .sshpasswd.gpg) ssh ${STRING_TUNS[*]} ${USER_TUN}@${BASTION_HOST} -o StrictHostKeyChecking=no -fgnNT 
-
 }
 
 ### sshpass with gpg
